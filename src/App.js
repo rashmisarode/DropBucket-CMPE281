@@ -1,25 +1,41 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Fragment } from 'react';
+import { Button, ButtonToolbar } from "react-bootstrap";
 import './App.css';
+import UserPage from './components/UserPage';
+import { Route, Router, Redirect } from 'react-router-dom'
+import LogInPage from './components/LogInPage';
 
-function App() {
+function App(props) {
+  
+
+  if (props.location && props.location.hash) {
+    console.log(props.location.hash);
+    const tokenArr = props.location.hash.split("&");
+    if(tokenArr.length > 0) {
+      const token = tokenArr[0].replace("#id_token=", "")
+      sessionStorage.setItem("token", token);
+    }
+  }
+
+  const sessionToken = sessionStorage.getItem("token")
+
+  const isValid =  sessionToken != undefined &&  sessionToken.length>0 ;
+
+  console.log("IsValid", isValid);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+         {isValid && 
+         <UserPage></UserPage>
+        } 
+        {
+          !isValid && 
+          <LogInPage></LogInPage>
+        }
+
+
+    </Fragment>
+   
   );
 }
 
