@@ -22,9 +22,12 @@ function getUserData() {
         return res.json();
     })
 }
-function uploadFile(inputFile) {
+function uploadFile(inputFile, userData, description) {
     const formData = new FormData();
     formData.append('inputFile', inputFile);
+    formData.append('userName', userData);
+    formData.append('description', description);
+    console.log(`UserNAme: ${userData}, desc: ${description}`);
     const requestOption = {
         method: 'POST',
         body: formData,
@@ -35,16 +38,14 @@ function uploadFile(inputFile) {
         return res;
     })
 }
-function deleteFile() {
+function deleteFile(fileName,id) {
     const requestOption = {
         method: 'DELETE',
         body: JSON.stringify({
-
+            "deleteFile": fileName,
+            "userId": id
         }),
         headers: { "Content-Type": "application/json" }
     }
-    return fetch(`${apiConfig.endpointURL}/delete_file`, requestOption).then(res => {
-        //            console.log(res.json());
-        return res.json();
-    })
+    return fetch(`${apiConfig.endpointURL}/delete_file`, requestOption)
 }

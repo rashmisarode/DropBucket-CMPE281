@@ -1,50 +1,71 @@
 import React, { PureComponent, useCallback, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { dataService } from '../services/dataService';
-
+import { Card, Button } from 'react-bootstrap';
+var jwt = require('jsonwebtoken');
 // rfc
-function FileUpload(props) {
-    var message
-    const onDrop = useCallback(acceptedFiles => {
-        console.log(acceptedFiles);
-        setGreeting('Upload File')
-        if (acceptedFiles.length > 0) {
 
-            dataService.uploadFile(acceptedFiles[0])
+class FileUpload extends PureComponent {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            files: [],
+            descr: "",
+            result: ""
+        }
+        this.uploadFile = this.uploadFile.bind(this);
+    }
+
+    uploadFile() {
+        const userData = this.props.user
+        console.log(`userData: ${userData}`);
+        const files = this.state.files;
+        if (files.length > 0) {
+            dataService.uploadFile(files[0], userData, this.state.descr)
                 .then(json => {
                     console.log(json);
-                    setGreeting("File Uploaded successfully")
-                  // register file in db with user details;  
+                    this.setState({
+                        result: "File Uploaded successfully"
+                    }); 
+                    setTimeout(()=> {
+                        this.props.refreshList();
+                    }, 500);
+
                 })
                 .catch(reason => {
                     console.log(reason);
+                    this.props.refreshList();
                 });
-
         }
+    }
 
-    }, []);
+    render() {
+        return (
+            <div>
+                <Card>
+                    <Card.Header> File Upload Result: {this.state.result} </Card.Header>
+                    <Card.Body>
+                        <input type="file" onChange={e => this.setState({
+                            files: e.target.files
+                        })}> 
+                        </input>
+                        <input
+                            value={this.state.desc}
+                            onChange={e => this.setState({
+                                descr: e.target.value
+                            })}
+                            placeholder="Description"
+                            type="text"
+                            name="Description"
+                        />
+                        <Button onClick={this.uploadFile}>Upload</Button>
+                    </Card.Body>
+                </Card>
 
-    const [greeting, setGreeting] = useState(
-        'Upload File'
-    );
-
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
-
-
-    return (
-        <div>
-            <h1> File Upload Result: {greeting} </h1>
-            <div {...getRootProps()} className="dropzone">
-                <input {...getInputProps()} />
-                {
-                    isDragActive ?
-                        <p>Drop the files here ...</p> :
-                        <p>Drag 'n' drop some files here, or click to select files</p>
-                }
             </div>
-        </div>
-
-    );
+        )
+    }
 }
 
 export default FileUpload

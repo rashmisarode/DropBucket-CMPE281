@@ -12,7 +12,7 @@ function App(props) {
     console.log(props.location.hash);
     const tokenArr = props.location.hash.split("&");
     if(tokenArr.length > 0) {
-      const token = tokenArr[0].replace("#id_token=", "")
+      const token = tokenArr[0].replace("#id_token=", "").replace("#access_token=", "")
       sessionStorage.setItem("token", token);
     }
   }
