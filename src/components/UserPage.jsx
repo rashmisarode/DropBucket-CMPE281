@@ -59,9 +59,11 @@ class UserPage extends PureComponent {
         this.setState({
             userData: userObj
         })
-        const isAdmin = userObj && userObj["cognito:groups"].filter(g => g == "admin").length > 0;
+        const isAdmin = userObj && userObj["cognito:groups"] && userObj["cognito:groups"].filter(g => g == "admin").length > 0;
 
-        this.setState({ isAdmin })
+        this.setState({ isAdmin });
+
+        dataService.getUser()
     }
 
     onClickDownLoad(file) {
