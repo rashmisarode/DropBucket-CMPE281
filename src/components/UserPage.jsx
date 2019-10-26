@@ -1,10 +1,11 @@
 import React, { PureComponent } from 'react'
-import { Col, Form, Button, FormControl, Navbar, Table, Card } from "react-bootstrap";
+import { Button, Navbar, Table } from "react-bootstrap";
 import { dataService } from '../services/dataService';
 import FileUpload from './FileUpload';
 import LogOut from './LogOut';
 import LogInPage from './LogInPage';
 var jwt = require('jsonwebtoken');
+
 
 class UserPage extends PureComponent {
     constructor(props) {
@@ -30,9 +31,9 @@ class UserPage extends PureComponent {
         })
     }
 
-    updateTable() {
+    updateTable2(user) {
         console.log("Called Update Table");
-        dataService.getUserData()
+        dataService.getUserData(user)
             .then(json => {
                 console.log(json);
                 if (Array.isArray(json)) {
@@ -45,10 +46,23 @@ class UserPage extends PureComponent {
                 console.log("Failed to fetch data from server, reason is : ", reason);
             });
     }
-
+    updateTable() {
+        console.log("Called Update Table");
+        dataService.getAdminData()
+            .then(json => {
+                console.log(json);
+                if (Array.isArray(json)) {
+                    this.setState({
+                        userDataDynamo: json
+                    });
+                }
+            })
+            .catch(reason => {
+                console.log("Failed to fetch data from server, reason is : ", reason);
+            });
+    }
     componentDidMount() {
-        this.updateTable()
-
+        
         var token = sessionStorage.getItem("token");
         var decoded = jwt.decode(token);
         // get the decoded payload and header
@@ -62,9 +76,20 @@ class UserPage extends PureComponent {
         const isAdmin = userObj && userObj["cognito:groups"] && userObj["cognito:groups"].filter(g => g == "admin").length > 0;
 
         this.setState({ isAdmin });
-
+        setTimeout(()=> {
+            console.log("UserEmailCheckBefore:"+this.state.userData.email)
+            console.log("isAdmin:"+this.state.isAdmin)
+            if (this.state.isAdmin){
+                this.updateTable()
+            } else {
+                this.updateTable2(this.state.userData.email);
+            }
+        }, 500);
+        
+      
         dataService.getUser()
     }
+    
 
     onClickDownLoad(file) {
         window.open("https://d3k2ba7dd5osnx.cloudfront.net/" + file);
@@ -74,7 +99,14 @@ class UserPage extends PureComponent {
         dataService.deleteFile(fileName, id)
             .then(json => {
                 console.log(json);
-                this.updateTable();
+                setTimeout(()=> {
+                if (this.state.isAdmin){
+                    this.updateTable()
+                } else {
+                    this.updateTable2(this.state.userData.email);
+                }
+            }, 300);
+                
             })
             .catch(reason => {
                 console.log("Failed to delete, reason is : ", reason);
@@ -94,18 +126,17 @@ class UserPage extends PureComponent {
 
             <div>
                 <Navbar bg="dark" variant="dark">
-                    <Navbar.Brand>Cloud Project 1</Navbar.Brand>
+                    <Navbar.Brand>DropBucket</Navbar.Brand>
                     <Navbar.Collapse className="justify-content-end">
                         <Navbar.Text>
                             Signed in as: {this.state.userData &&
                                 <a href="#login">{this.state.userData.email}</a>}
-
-
+                            &nbsp;&nbsp;
                             User Type: {
-                                isAdmin && <b> "Administrator" </b>
+                                isAdmin && <a> "Administrator" </a>
                             }
                             {
-                                !isAdmin && <b> "User (Non Admin)"</b>
+                                !isAdmin && <a> "User (Non Admin)"</a>
                             }
                         </Navbar.Text>
                     </Navbar.Collapse>
@@ -118,13 +149,15 @@ class UserPage extends PureComponent {
                         user={this.state.userData.email}
                         desc={this.state.desc}
                         refreshList={e => this.updateTable()}
+                        refreshList2={e => this.updateTable2(e)}
+                        isAdmin={isAdmin}
                     >
                     </FileUpload>
                 }
 
 
-                <div className="App container" style={{ "margin": "20px" }}>
-                    <Table striped bordered hover>
+                <div style={{ "margin": "50px" }}>
+                    <Table striped bordered hover responsive>
                         <thead>
                             <tr key={0}>
                                 {
@@ -144,20 +177,20 @@ class UserPage extends PureComponent {
                             {
                                 this.state.userDataDynamo.map(item => {
                                     return (
-                                        <tr key={item.userId.S}>
+                                        <tr key={item.userId}>
                                             {
                                                 isAdmin &&
-                                                <td>{item.userName.S}</td>
+                                                <td>{item.userName}</td>
                                             }
 
-                                            <td>{item.fileName.S}</td>
-                                            <td>{item.description.S}</td>
-                                            <td>{new Date(item.fileCreatedTime.S).toLocaleString()}</td>
-                                            <td>{new Date(item.fileUpdatedTime.S).toLocaleString()}</td>
-                                            <td><Button variant="outline-success" onClick={event => this.onClickDownLoad(item.fileName.S)}>
-                                                <a href={"https://d3k2ba7dd5osnx.cloudfront.net/" + item.fileName.S} target="_blank" download={item.fileName.S}>DownLoad</a>
+                                            <td>{item.fileName}</td>
+                                            <td>{item.description}</td>
+                                            <td>{new Date(item.fileCreatedTime).toLocaleString()}</td>
+                                            <td>{new Date(item.fileUpdatedTime).toLocaleString()}</td>
+                                            <td><Button variant="outline-success" onClick={event => this.onClickDownLoad(item.fileName)}>
+                                                <a href={"https://d3k2ba7dd5osnx.cloudfront.net/" + item.fileName} target="_blank" download={item.fileName}>DownLoad</a>
                                             </Button></td>
-                                            <td><Button variant="outline-danger" onClick={event => this.onClickDelete(item.fileName.S, item.userId.S)}>
+                                            <td><Button variant="outline-danger" onClick={event => this.onClickDelete(item.fileName, item.userId)}>
                                                 Delete
                                             </Button></td>
                                         </tr>

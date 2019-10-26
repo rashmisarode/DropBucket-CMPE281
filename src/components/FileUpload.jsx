@@ -1,9 +1,17 @@
-import React, { PureComponent, useCallback, useState } from 'react'
-import { useDropzone } from 'react-dropzone'
+import React, { PureComponent } from 'react'
+//import { useDropzone } from 'react-dropzone'
 import { dataService } from '../services/dataService';
 import { Card, Button } from 'react-bootstrap';
 var jwt = require('jsonwebtoken');
 // rfc
+const inputFileButton = {
+    marginLeft: "20px",
+    backgroundColor: "#4CAF50",
+    border: "none",
+    color: "white",
+    margin: "4px 2px",
+    cursor: "pointer",
+}
 
 class FileUpload extends PureComponent {
     constructor(props) {
@@ -29,7 +37,11 @@ class FileUpload extends PureComponent {
                         result: "File Uploaded successfully"
                     }); 
                     setTimeout(()=> {
-                        this.props.refreshList();
+                        if (this.props.isAdmin){
+                            this.props.refreshList();
+                        } else {
+                            this.props.refreshList2(userData);
+                        } 
                     }, 500);
 
                 })
@@ -43,14 +55,15 @@ class FileUpload extends PureComponent {
     render() {
         return (
             <div>
-                <Card>
+                <Card className="text-center" style={{ margin: '5rem 10rem 2rem 10rem'}} >
                     <Card.Header> File Upload Result: {this.state.result} </Card.Header>
                     <Card.Body>
-                        <input type="file" onChange={e => this.setState({
+                        <input type="file" style={{"marginLeft": "20px"}} onChange={e => this.setState({
                             files: e.target.files
                         })}> 
                         </input>
-                        <input
+                       <a  style={{"marginLeft": "40px"}}> 
+                       <input
                             value={this.state.desc}
                             onChange={e => this.setState({
                                 descr: e.target.value
@@ -59,7 +72,10 @@ class FileUpload extends PureComponent {
                             type="text"
                             name="Description"
                         />
-                        <Button onClick={this.uploadFile}>Upload</Button>
+                        &nbsp; &nbsp;
+                        <Button onClick={this.uploadFile} style={{"padding": "5px"}}>Upload</Button>
+                       </a>
+                        
                     </Card.Body>
                 </Card>
 

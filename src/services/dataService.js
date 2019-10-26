@@ -1,11 +1,12 @@
-import axios from "axios";
-import * as AWS from 'aws-sdk/global';
+//import axios from "axios";
+//import * as AWS from 'aws-sdk/global';
 
 global.fetch = require('node-fetch');
 var AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 
 export const dataService = {
     getUserData,
+    getAdminData,
     uploadFile,
     deleteFile,
     getUser,
@@ -16,17 +17,30 @@ export const apiConfig = {
     endpointURL: "http://localhost:3001"
 }
 
-function getUserData() {
+function getUserData(userName) {
+    console.log("user"+userName);
+    const requestOption = {
+        method: 'GET',
+        headers: { "Content-Type": "application/json" }
+    }
+    return fetch(`${apiConfig.endpointURL}/getUserData/${userName}`, requestOption).then(res => {
+        console.log(res); 
+        return res.json();
+    })
+}
+
+function getAdminData() {
 
     const requestOption = {
         method: 'GET',
         headers: { "Content-Type": "application/json" }
     }
     return fetch(`${apiConfig.endpointURL}/getAdminData`, requestOption).then(res => {
-        //console.log(res.json()); 
+        console.log(res); 
         return res.json();
     })
 }
+
 function uploadFile(inputFile, userData, description) {
     const formData = new FormData();
     formData.append('inputFile', inputFile);
