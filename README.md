@@ -25,7 +25,7 @@ Web Application: (https://rashmicsproject.ml/)
 
 * S3: This will be used to store and manage the files uploaded by user. The storage of this bucket will be Standard S3.
 
-S3 - Standard Infrequent Access: S3 allows to specify the lifecycle rules for given s3 bucket, I have configured it max duration for given objects in bucket to stay in this storage class for 75 days. 
+* S3 - Standard Infrequent Access: S3 allows to specify the lifecycle rules for given s3 bucket, I have configured it max duration for given objects in bucket to stay in this storage class for 75 days. 
 
 * Transfer Acceleration for S3 Bucket: This allows the bucket for secure and accelerated transfer in terms of the data rates for files.
 
