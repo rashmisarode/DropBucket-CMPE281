@@ -14,7 +14,7 @@ export const dataService = {
 }
 
 export const apiConfig = {
-    endpointURL: "http://localhost:3001"
+    endpointURL: "https://rashmicsproject.ml/api"
 }
 
 function getUserData(userName) {

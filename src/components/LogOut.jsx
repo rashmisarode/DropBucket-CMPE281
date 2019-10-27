@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Button, ButtonToolbar } from "react-bootstrap";
-import LogInPage from './LogInPage';
+import { Button } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 
 function LogOut(props) {

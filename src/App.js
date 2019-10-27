@@ -1,8 +1,7 @@
 import React, { Fragment } from 'react';
-import { Button, ButtonToolbar } from "react-bootstrap";
 import './App.css';
 import UserPage from './components/UserPage';
-import { Route, Router, Redirect } from 'react-router-dom'
+//import { Route, Router, Redirect } from 'react-router-dom'
 import LogInPage from './components/LogInPage';
 
 function App(props) {
